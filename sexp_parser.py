@@ -23,6 +23,7 @@ import logging
 import traceback
 import bisect
 from collections import OrderedDict
+from dummy_str import DummyStr
 
 __author__ = "Zheng, Lei"
 __copyright__ = "Copyright 2016, Zheng, Lei"
@@ -155,6 +156,7 @@ class Sexp(object):
             return self
         return self._value
 
+    # change this so that action is configurable
     def __setitem__(self,key,value):
         if not isinstance(value,Sexp):
             self._value.add(Sexp(key,value))
@@ -199,17 +201,17 @@ class Sexp(object):
         for v in iter(self._value):
             yield v
 
-    def _export(self, out, prefix='', indent='  '):
+    def _export(self, out=DummyStr(), prefix='', indent='  '):
         '''Export self to an S-epression and write to output stream
             Args: 
                 out: output stream, only needs to implement ``out.write(string)``
                 prefix(string): prefixing spaces for output formatting 
                 indent(string): incremental prefix for sub levels
         '''
-
+    
         if self._value is None:
             out.write(' {}'.format(self._key))
-            return
+            return out;
 
         export_key_ = isinstance(self._key,string_types)
         if export_key_:
@@ -235,6 +237,11 @@ class Sexp(object):
 
         if export_key_:
             out.write(')')
+        
+        return out;
+
+    def __repr__(self) -> str:
+        return self._export().str;
 
     def _exportValue(self,out,value,prefix,indent):
         '''Called by `_export()` to export each individual value

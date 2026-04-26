@@ -130,12 +130,13 @@ class Sexp(object):
         Non-underscored attributes are reserved for accessing named values (i.e.
         sub S-Expressions)
     '''
-    __slots__ = '_key','_value','_line'
+    __slots__ = '_key','_value','_line', "_action"
 
-    def __init__(self,key,value=None,line=-1):
+    def __init__(self,key,value=None,line=-1, action=3):
         self._line = line
         self._key = key
         self._value = SexpValueDict() if value is None else value
+        self._action = action;
 
     def __len__(self):
         try:
@@ -159,11 +160,11 @@ class Sexp(object):
     # change this so that action is configurable
     def __setitem__(self,key,value):
         if not isinstance(value,Sexp):
-            self._value.add(Sexp(key,value))
+            self._value.add(Sexp(key,value, action=self._action), self._action)
         elif value._key != key:
             raise KeyError('{}: key mismatch'.format(self._line))
         else:
-            self._value.add(value)
+            self._value.add(value, self.action)
 
     def __delitem__(self,key):
         del self._value[key]
@@ -241,7 +242,10 @@ class Sexp(object):
         return out;
 
     def __repr__(self) -> str:
-        return self._export().str;
+        dummy_str = self._export();
+        ret_str = dummy_str.str;
+        dummy_str.clear();
+        return ret_str
 
     def _exportValue(self,out,value,prefix,indent):
         '''Called by `_export()` to export each individual value
@@ -334,7 +338,7 @@ class SexpList(Sexp):
         super(SexpList,self).__init__(key,[])
         self._append(value)
 
-    def _export(self,out,prefix='',indent='  '):
+    def _export(self,out=DummyStr(),prefix='',indent='  '):
         for v in self._value:
             self._exportValue(out,v,prefix,indent)
 

@@ -169,6 +169,8 @@ class Sexp(object):
     def __delitem__(self,key):
         del self._value[key]
 
+    # might want to change this
+    # so that it doesn't just print the values
     def __str__(self):
         return str(self._value)
 

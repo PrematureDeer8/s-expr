@@ -23,7 +23,7 @@ import logging
 import traceback
 import bisect
 from collections import OrderedDict
-from dummy_str import DummyStr
+from .dummy_str import DummyStr
 
 __author__ = "Zheng, Lei"
 __copyright__ = "Copyright 2016, Zheng, Lei"
@@ -130,6 +130,10 @@ class Sexp(object):
         Non-underscored attributes are reserved for accessing named values (i.e.
         sub S-Expressions)
     '''
+    OVERWRITE = 0;
+    EXCEPTION = 1;
+    SEXPLIST = 2;
+    DYNAMIC = 3;
     __slots__ = '_key','_value','_line', "_action"
 
     def __init__(self,key,value=None,line=-1, action=3):
@@ -164,7 +168,7 @@ class Sexp(object):
         elif value._key != key:
             raise KeyError('{}: key mismatch'.format(self._line))
         else:
-            self._value.add(value, self.action)
+            self._value.add(value, self._action)
 
     def __delitem__(self,key):
         del self._value[key]
@@ -382,7 +386,7 @@ class SexpParser(Sexp):
 
     __slots__ = '_err'
 
-    def __init__(self,data):
+    def __init__(self,data, action=3):
         '''Constructor that dispatches parsing to lower level parsers
 
             Args: 
@@ -428,7 +432,7 @@ class SexpParser(Sexp):
             values if they are missing.
         '''
 
-        super(SexpParser,self).__init__(data[1],None,data[0])
+        super(SexpParser,self).__init__(data[1],None,data[0], action=action)
 
         self._err = []
 

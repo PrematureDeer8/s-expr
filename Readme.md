@@ -83,3 +83,5 @@ The corresponding attribute names are:
 odict_keys([0, 1, 'at', 'length', 'name', 'number'])
 ```
 Here the numbers 0 and 1 correspond to the values **power_in** and **line**.
+#### Note about action
+There is a special attribute in the SexpParser class named _action. When set to the value of 3 then it allows for sexpr values to be append onto an already existing sexpr object.
